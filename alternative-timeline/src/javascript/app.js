@@ -44,7 +44,8 @@ Ext.define("TSAlternativeTimeline", {
             xtype: 'tsalternativetimeline',
             height: 500,
             width: this.getWidth() - 20,
-            records: records
+            records: records,
+            pageSize: 7
         });
     },
     
