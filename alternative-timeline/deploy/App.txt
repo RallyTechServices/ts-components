@@ -3,14 +3,14 @@
 <head>
     <title>TSAlternativeTimeline</title>
     <!--  (c) 2015,2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Wed Apr 13 2016 14:19:08 GMT-0700 (PDT) -->
+    <!--  Build Date: Tue Jun 21 2016 18:31:35 GMT-0700 (PDT) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Wed Apr 13 2016 14:19:08 GMT-0700 (PDT)";
-        var CHECKSUM = 9295250055;
+        var APP_BUILD_DATE = "Tue Jun 21 2016 18:31:35 GMT-0700 (PDT)";
+        var CHECKSUM = 9355339525;
     </script>
     
-    <script type="text/javascript" src="/apps/2.0/sdk.js"></script>
+    <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
 
     <script type="text/javascript">
         Rally.onReady(function() {
@@ -742,6 +742,9 @@ Ext.define("TSAlternativeTimeline", {
     margin-top: 25px;
     margin-right: 5px;
     cursor: pointer;
+}
+.x-border-layout-ct {
+    background-color: white;
 }
     </style>
 
