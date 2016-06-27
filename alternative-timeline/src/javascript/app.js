@@ -4,7 +4,7 @@ Ext.define("TSAlternativeTimeline", {
     logger: new Rally.technicalservices.Logger(),
     defaults: { margin: 10 },
     items: [
-        {xtype:'container',itemId:'message_box',tpl:'Hello, <tpl>{_refObjectName}, this is a bootstrap app for timeline</tpl>'},
+        {xtype:'container',itemId:'message_box',tpl:'Hello, <tpl>{user}, this is a bootstrap app for timeline.  Start: {start}, End: {end}</tpl>'},
         {xtype:'container',itemId:'display_box' }
     ],
 
@@ -16,8 +16,17 @@ Ext.define("TSAlternativeTimeline", {
         var me = this;
         this.setLoading("Loading stuff...");
 
-        this.down('#message_box').update(this.getContext().getUser());
-        var start = Rally.util.DateTime.toIsoString( Rally.util.DateTime.add(new Date(), 'month', -18) );
+        this.start = Rally.util.DateTime.add(new Date(), 'month', -18);
+        this.end = Rally.util.DateTime.add(new Date(), 'month', 1);
+        
+        var start = Rally.util.DateTime.toIsoString(this.start);
+        var end = Rally.util.DateTime.toIsoString(this.end);
+
+        this.down('#message_box').update({
+            user: this.getContext().getUser()._refObjectName,
+            start: start,
+            end: end 
+        });
         
         var config = { 
             model: 'PortfolioItem/Feature',
@@ -46,8 +55,8 @@ Ext.define("TSAlternativeTimeline", {
             width: this.getWidth() - 20,
             records: records,
             pageSize: 7,
-            chartStartDate: Rally.util.DateTime.add(new Date(), 'month', -13),
-            chartEndDate: Rally.util.DateTime.add(new Date(), 'month', 1)
+            chartStartDate: this.start,
+            chartEndDate: this.end
         });
     },
     

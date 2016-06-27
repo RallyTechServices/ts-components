@@ -3,11 +3,11 @@
 <head>
     <title>TSAlternativeTimeline</title>
     <!--  (c) 2015,2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Sun Jun 26 2016 19:41:47 GMT-0700 (PDT) -->
+    <!--  Build Date: Sun Jun 26 2016 20:19:06 GMT-0700 (PDT) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Sun Jun 26 2016 19:41:47 GMT-0700 (PDT)";
-        var CHECKSUM = 12220954063;
+        var APP_BUILD_DATE = "Sun Jun 26 2016 20:19:06 GMT-0700 (PDT)";
+        var CHECKSUM = 12673402681;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -245,7 +245,7 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
         this.callParent(arguments);
 
         this.chartStartDate = this._moveToStartOfMonth(this.chartStartDate);
-        this.chartEndDate = this._moveToStartOfMonth(this.chartEndDate);
+        this.chartEndDate = this._moveToEndOfMonth(this.chartEndDate);
         
         this._buildChart(this.records);
     },
@@ -254,6 +254,12 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
         var day_of_month = start_date.getDate();
         var shift = -1 * ( day_of_month - 1 );         
         return Rally.util.DateTime.add(start_date, 'day', shift);
+    },
+    
+    _moveToEndOfMonth: function(end_date) {
+        var start_of_month = Rally.util.DateTime.add(this._moveToStartOfMonth(end_date), 'month', 1);
+        
+        return Rally.util.DateTime.add(start_of_month, 'day', -1);
     },
     
     _buildChart: function(records) {
@@ -727,7 +733,7 @@ Ext.define("TSAlternativeTimeline", {
     logger: new Rally.technicalservices.Logger(),
     defaults: { margin: 10 },
     items: [
-        {xtype:'container',itemId:'message_box',tpl:'Hello, <tpl>{_refObjectName}, this is a bootstrap app for timeline</tpl>'},
+        {xtype:'container',itemId:'message_box',tpl:'Hello, <tpl>{user}, this is a bootstrap app for timeline.  Start: {start}, End: {end}</tpl>'},
         {xtype:'container',itemId:'display_box' }
     ],
 
@@ -739,8 +745,17 @@ Ext.define("TSAlternativeTimeline", {
         var me = this;
         this.setLoading("Loading stuff...");
 
-        this.down('#message_box').update(this.getContext().getUser());
-        var start = Rally.util.DateTime.toIsoString( Rally.util.DateTime.add(new Date(), 'month', -18) );
+        this.start = Rally.util.DateTime.add(new Date(), 'month', -18);
+        this.end = Rally.util.DateTime.add(new Date(), 'month', 1);
+        
+        var start = Rally.util.DateTime.toIsoString(this.start);
+        var end = Rally.util.DateTime.toIsoString(this.end);
+
+        this.down('#message_box').update({
+            user: this.getContext().getUser()._refObjectName,
+            start: start,
+            end: end 
+        });
         
         var config = { 
             model: 'PortfolioItem/Feature',
@@ -769,8 +784,8 @@ Ext.define("TSAlternativeTimeline", {
             width: this.getWidth() - 20,
             records: records,
             pageSize: 7,
-            chartStartDate: Rally.util.DateTime.add(new Date(), 'month', -13),
-            chartEndDate: Rally.util.DateTime.add(new Date(), 'month', 1)
+            chartStartDate: this.start,
+            chartEndDate: this.end
         });
     },
     

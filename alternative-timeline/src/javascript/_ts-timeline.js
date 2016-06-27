@@ -31,7 +31,7 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
         this.callParent(arguments);
 
         this.chartStartDate = this._moveToStartOfMonth(this.chartStartDate);
-        this.chartEndDate = this._moveToStartOfMonth(this.chartEndDate);
+        this.chartEndDate = this._moveToEndOfMonth(this.chartEndDate);
         
         this._buildChart(this.records);
     },
@@ -40,6 +40,12 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
         var day_of_month = start_date.getDate();
         var shift = -1 * ( day_of_month - 1 );         
         return Rally.util.DateTime.add(start_date, 'day', shift);
+    },
+    
+    _moveToEndOfMonth: function(end_date) {
+        var start_of_month = Rally.util.DateTime.add(this._moveToStartOfMonth(end_date), 'month', 1);
+        
+        return Rally.util.DateTime.add(start_of_month, 'day', -1);
     },
     
     _buildChart: function(records) {
