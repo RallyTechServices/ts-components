@@ -17,7 +17,7 @@ Ext.define("TSAlternativeTimeline", {
         this.setLoading("Loading stuff...");
 
         this.down('#message_box').update(this.getContext().getUser());
-        var start = Rally.util.DateTime.toIsoString( Rally.util.DateTime.add(new Date(), 'month', -3) );
+        var start = Rally.util.DateTime.toIsoString( Rally.util.DateTime.add(new Date(), 'month', -18) );
         
         var config = { 
             model: 'PortfolioItem/Feature',
@@ -45,7 +45,9 @@ Ext.define("TSAlternativeTimeline", {
             height: 500,
             width: this.getWidth() - 20,
             records: records,
-            pageSize: 7
+            pageSize: 7,
+            chartStartDate: Rally.util.DateTime.add(new Date(), 'month', -13),
+            chartEndDate: Rally.util.DateTime.add(new Date(), 'month', 1)
         });
     },
     
