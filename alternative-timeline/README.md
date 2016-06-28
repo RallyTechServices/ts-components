@@ -6,7 +6,8 @@ TODO:
 * horizontal scrolling
 * zoom
 * colors for bars
-* different date range
+* milestones
+* hierarchy/tree -- probably not possible in this incarnation
 * ...
 
 ## Development Notes
