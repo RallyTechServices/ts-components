@@ -3,14 +3,24 @@
 A timeline built using Highcharts instead of the gantt thing that the thing in the product uses.  When this is mature, it should be much easier to write/create timeline style things.
 
 TODO:
-* horizontal scrolling
-* zoom
+* pass function for clicking on bars
+* hovers
 * colors for bars
 * milestones
+* horizontal scrolling
+* zoom
 * hierarchy/tree -- probably not possible in this incarnation
 * ...
 
 ## Development Notes
+
+The app.js file is provided for testing and demonstrating how to pass values.  The _ts-timeline.js file is expected to be used on its own
+
+* Can pass releases, iterations, and portfolio items as records in an array.  If all records passed are of the same type but some other value, you can use the plannedStartField and plannedEndField configuration settings to define which fields hold the dates for beginning and ending (note that it needs to be a JS date for now).  If it's a mixed array, then the fields for start and end are determined by the plannedEndFieldMap/plannedStartFieldMap (which you can override).
+* Can modify the formatting of the string that shows up on the vertical axis by providing a new method to getCategoryString (which is given each record in turn). An example of the use here would be to provide coloring on the label or an indent.
+
+ 
+
 
 ### First Load
 
