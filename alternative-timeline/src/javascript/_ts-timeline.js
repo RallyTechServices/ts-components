@@ -208,7 +208,14 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
             var start_index = this._getPositionOnTimeline(categories, item.get(plannedStartField) );
             var end_index   = this._getPositionOnTimeline(categories, item.get(plannedEndField) );
             
-            return [ start_index, end_index ];
+            var colorObject = Rally.util.HealthColorCalculator.calculateHealthColorForPortfolioItemData(item.data, 'PercentDoneByStoryCount');
+
+            return {
+                color: colorObject.hex,
+                low: start_index, 
+                high: end_index ,
+                _status: colorObject.label
+            };
         },this);
     },
     

@@ -3,11 +3,11 @@
 <head>
     <title>TSAlternativeTimeline</title>
     <!--  (c) 2015,2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Tue Jun 28 2016 14:58:35 GMT-0700 (PDT) -->
+    <!--  Build Date: Tue Jun 28 2016 16:03:17 GMT-0700 (PDT) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Tue Jun 28 2016 14:58:35 GMT-0700 (PDT)";
-        var CHECKSUM = 15593291162;
+        var APP_BUILD_DATE = "Tue Jun 28 2016 16:03:17 GMT-0700 (PDT)";
+        var CHECKSUM = 15912244846;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -422,7 +422,14 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
             var start_index = this._getPositionOnTimeline(categories, item.get(plannedStartField) );
             var end_index   = this._getPositionOnTimeline(categories, item.get(plannedEndField) );
             
-            return [ start_index, end_index ];
+            var colorObject = Rally.util.HealthColorCalculator.calculateHealthColorForPortfolioItemData(item.data, 'PercentDoneByStoryCount');
+
+            return {
+                color: colorObject.hex,
+                low: start_index, 
+                high: end_index ,
+                _status: colorObject.label
+            };
         },this);
     },
     
