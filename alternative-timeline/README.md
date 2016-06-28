@@ -1,6 +1,6 @@
 #TSAlternativeTimeline
 
-![timeline](./images/images.png "Alternative Timeline")
+![timeline](./images/timeline.png "Alternative Timeline")
 
 A timeline built using Highcharts instead of the gantt thing that the thing in the product uses.  When this is mature, it should be much easier to write/create timeline style things.
 
