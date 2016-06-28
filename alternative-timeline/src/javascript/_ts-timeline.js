@@ -355,7 +355,8 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
                 max: max,
                 labels: {
                     align: 'left',
-                    x: -1 * vertical_axis_width
+                    x: -1 * vertical_axis_width,
+                    useHTML: true
                 }
             },
             yAxis: {
