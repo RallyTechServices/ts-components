@@ -17,8 +17,12 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
         
         pageSize: 7,
         
-        plannedStartField: 'PlannedStartDate',
-        plannedEndField  : 'PlannedEndDate',
+        /*
+         * Override mapping provided by type in the plannedStartMap and plannedEndMap
+         * (If provided, will use these fields for all record types)
+         */
+        plannedStartField: null,
+        plannedEndField  : null,
         
         actualStartField : 'ActualStartDate',
         actualEndField   : 'ActualEndDate',
@@ -157,11 +161,45 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
         return 0;
     },
     
+    plannedStartFieldMap: {
+        iteration: "StartDate",
+        release: "ReleaseStartDate",
+        "default": "PlannedStartDate"
+    },
+    
+    plannedEndFieldMap: {
+        "iteration": "EndDate",
+        "release": "ReleaseDate",
+        "default": "PlannedEndDate"
+    },
+    
+    _getPlannedEndField: function(type) {
+        if ( !Ext.isEmpty(this.plannedEndField) ) { return this.plannedEndField; }
+        
+        if ( !Ext.isEmpty(this.plannedEndFieldMap[type]) ) { return this.plannedEndFieldMap[type]; }
+        if ( !Ext.isEmpty(this.plannedEndFieldMap['default']) ) { return this.plannedEndFieldMap['default']; }
+        
+        return 'PlannedEndDate';
+    },
+    
+    _getPlannedStartField: function(type) {
+        if ( !Ext.isEmpty(this.plannedStartField) ) { return this.plannedStartField; }
+        console.log('++', type, this.plannedStartFieldMap[type], this.plannedStartFieldMap);
+
+        if ( !Ext.isEmpty(this.plannedStartFieldMap[type]) ) { return this.plannedStartFieldMap[type]; }
+        if ( !Ext.isEmpty(this.plannedStartFieldMap['default']) ) { return this.plannedStartFieldMap['default']; }
+        
+        return 'PlannedStartDate';
+    },
+    
     _getPlannedRangesFromItems: function(items, categories) {
-        var plannedStartField = this.plannedStartField;
-        var plannedEndField   = this.plannedEndField;
         
         return Ext.Array.map(items, function(item) {
+            var plannedStartField = this._getPlannedStartField(item.get('_type'));
+            var plannedEndField   = this._getPlannedEndField(item.get('_type'));
+            
+            console.log('--', item.get('_type'), plannedStartField, plannedEndField, item);
+            
             var start_index = this._getPositionOnTimeline(categories, item.get(plannedStartField) );
             var end_index   = this._getPositionOnTimeline(categories, item.get(plannedEndField) );
             

@@ -28,16 +28,32 @@ Ext.define("TSAlternativeTimeline", {
             end: end 
         });
         
-        var config = { 
+        var pi_config = { 
             model: 'PortfolioItem/Feature',
             filters: [{property:'PlannedStartDate', operator: '>=', value: start}],
             fetch: ['ObjectID','Name','FormattedID','PlannedStartDate','PlannedEndDate','ActualStartDate','ActualEndDate']
-        }
+        };
 
-        this._loadWsapiRecords(config).then({
+        var release_config = { 
+            model: 'Release',
+            filters: [{property:'ReleaseStartDate', operator: '>=', value: start}],
+            fetch: ['ObjectID','Name','FormattedID','ReleaseStartDate','ReleaseDate']
+        };
+        
+        var iteration_config = { 
+            model: 'Iteration',
+            filters: [{property:'StartDate', operator: '>=', value: start}],
+            fetch: ['ObjectID','Name','FormattedID','StartDate','EndDate']
+        };
+        
+        Deft.Chain.sequence([
+            function() { return me._loadWsapiRecords(pi_config); },
+            function() { return me._loadWsapiRecords(release_config); },
+            function() { return me._loadWsapiRecords(iteration_config); }
+        ]).then({
             scope: this,
             success: function(records) {
-                this._displayTimeline(records);
+                this._displayTimeline(Ext.Array.flatten(records));
                 this.setLoading(false);
             },
             failure: function(error_message){
