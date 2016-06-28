@@ -3,11 +3,11 @@
 <head>
     <title>TSAlternativeTimeline</title>
     <!--  (c) 2015,2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Tue Jun 28 2016 16:03:17 GMT-0700 (PDT) -->
+    <!--  Build Date: Tue Jun 28 2016 16:26:53 GMT-0700 (PDT) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Tue Jun 28 2016 16:03:17 GMT-0700 (PDT)";
-        var CHECKSUM = 15912244846;
+        var APP_BUILD_DATE = "Tue Jun 28 2016 16:26:53 GMT-0700 (PDT)";
+        var CHECKSUM = 16221626102;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -424,6 +424,13 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
             
             var colorObject = Rally.util.HealthColorCalculator.calculateHealthColorForPortfolioItemData(item.data, 'PercentDoneByStoryCount');
 
+            if ( Ext.isEmpty(item.get('PercentDoneByStoryCount') ) || item.get('PercentDoneByStoryCount') < 0 ){
+                colorObject = {
+                    hex: '#000',
+                    label: 'Has no Percent Done by Story Count'
+                }
+            }
+            
             return {
                 color: colorObject.hex,
                 low: start_index, 
@@ -784,6 +791,7 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
     
     
 });
+
 Ext.define("TSAlternativeTimeline", {
     extend: 'Rally.app.App',
     componentCls: 'app',
@@ -817,7 +825,9 @@ Ext.define("TSAlternativeTimeline", {
         var pi_config = { 
             model: 'PortfolioItem/Feature',
             filters: [{property:'PlannedStartDate', operator: '>=', value: start}],
-            fetch: ['ObjectID','Name','FormattedID','PlannedStartDate','PlannedEndDate','ActualStartDate','ActualEndDate']
+            fetch: ['ObjectID','Name','FormattedID',
+                'PlannedStartDate','PlannedEndDate','ActualStartDate','ActualEndDate',
+                'PercentDoneByStoryCount']
         };
 
         var release_config = { 

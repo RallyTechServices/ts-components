@@ -210,6 +210,13 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
             
             var colorObject = Rally.util.HealthColorCalculator.calculateHealthColorForPortfolioItemData(item.data, 'PercentDoneByStoryCount');
 
+            if ( Ext.isEmpty(item.get('PercentDoneByStoryCount') ) || item.get('PercentDoneByStoryCount') < 0 ){
+                colorObject = {
+                    hex: '#000',
+                    label: 'Has no Percent Done by Story Count'
+                }
+            }
+            
             return {
                 color: colorObject.hex,
                 low: start_index, 

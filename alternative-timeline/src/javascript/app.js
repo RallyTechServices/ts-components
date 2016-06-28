@@ -31,7 +31,9 @@ Ext.define("TSAlternativeTimeline", {
         var pi_config = { 
             model: 'PortfolioItem/Feature',
             filters: [{property:'PlannedStartDate', operator: '>=', value: start}],
-            fetch: ['ObjectID','Name','FormattedID','PlannedStartDate','PlannedEndDate','ActualStartDate','ActualEndDate']
+            fetch: ['ObjectID','Name','FormattedID',
+                'PlannedStartDate','PlannedEndDate','ActualStartDate','ActualEndDate',
+                'PercentDoneByStoryCount']
         };
 
         var release_config = { 

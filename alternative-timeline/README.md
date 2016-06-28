@@ -17,9 +17,10 @@ TODO:
 
 The app.js file is provided for testing and demonstrating how to pass values.  The _ts-timeline.js file is expected to be used on its own
 
+* The timeline itself is not going to load data!  This one expects an array of records and those records will need to have the fields the chart is looking for to make its calculations.
 * Can pass releases, iterations, and portfolio items as records in an array.  If all records passed are of the same type but some other value, you can use the plannedStartField and plannedEndField configuration settings to define which fields hold the dates for beginning and ending (note that it needs to be a JS date for now).  If it's a mixed array, then the fields for start and end are determined by the plannedEndFieldMap/plannedStartFieldMap (which you can override).
 * Can modify the formatting of the string that shows up on the vertical axis by providing a new method to getCategoryString (which is given each record in turn). An example of the use here would be to provide coloring on the label or an indent.
-* Colors for bars are defined by Rally.util.HealthColorCalculator.calculateHealthColorForPortfolioItemData, which means that the color is going to be green for non PIs.  (Or set a field called PercentDoneByStoryCount to decide on color (or write a new function for configuring to allow folks to define it when they create a chart)).
+* Colors for bars are defined by Rally.util.HealthColorCalculator.calculateHealthColorForPortfolioItemData, which means that the color is going to be black for non PIs.  (Or set a field called PercentDoneByStoryCount to decide on color (or write a new function for configuring to allow folks to define it when they create a chart)).
  
 
 
