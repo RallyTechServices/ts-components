@@ -100,16 +100,26 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
         return config;
     },
     
-    _processItems: function(records) {
+    // override to make labels differently
+    getCategoryString: function(record) {
+        var type = record.get('_type');
+        if ( type == 'iteration' || type == 'release' ) {
+            return record.get('Name');
+        }
         
+        return Ext.String.format( '{0}: {1}',
+            record.get('FormattedID'),
+            record.get('Name')
+        );
+    },
+    
+    _processItems: function(records) {
         this.dateCategories = this._getDateCategories();
         
         this.categories = Ext.Array.map(records, function(record) { 
-            return Ext.String.format( '{0}: {1}',
-                record.get('FormattedID'),
-                record.get('Name')
-            );
-        });
+            return this.getCategoryString(record);
+        },this);
+        
                 
         var planned_series = { 
             name: 'Planned',
@@ -175,7 +185,6 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
     
     _getPlannedEndField: function(type) {
         if ( !Ext.isEmpty(this.plannedEndField) ) { return this.plannedEndField; }
-        
         if ( !Ext.isEmpty(this.plannedEndFieldMap[type]) ) { return this.plannedEndFieldMap[type]; }
         if ( !Ext.isEmpty(this.plannedEndFieldMap['default']) ) { return this.plannedEndFieldMap['default']; }
         
@@ -184,8 +193,6 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
     
     _getPlannedStartField: function(type) {
         if ( !Ext.isEmpty(this.plannedStartField) ) { return this.plannedStartField; }
-        console.log('++', type, this.plannedStartFieldMap[type], this.plannedStartFieldMap);
-
         if ( !Ext.isEmpty(this.plannedStartFieldMap[type]) ) { return this.plannedStartFieldMap[type]; }
         if ( !Ext.isEmpty(this.plannedStartFieldMap['default']) ) { return this.plannedStartFieldMap['default']; }
         
@@ -197,9 +204,7 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
         return Ext.Array.map(items, function(item) {
             var plannedStartField = this._getPlannedStartField(item.get('_type'));
             var plannedEndField   = this._getPlannedEndField(item.get('_type'));
-            
-            console.log('--', item.get('_type'), plannedStartField, plannedEndField, item);
-            
+                        
             var start_index = this._getPositionOnTimeline(categories, item.get(plannedStartField) );
             var end_index   = this._getPositionOnTimeline(categories, item.get(plannedEndField) );
             
