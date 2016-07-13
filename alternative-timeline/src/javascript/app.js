@@ -90,7 +90,14 @@ Ext.define("TSAlternativeTimeline", {
                 click: function() {
                     alert('Actual!');
                 }
-            }
+            },
+            additionalPlotlines: [{
+                color: '#0c0',
+                width: 1,
+                date: Rally.util.DateTime.add(new Date(),'day',-25),
+                zIndex: 4
+            
+            }]
         });
     },
     
