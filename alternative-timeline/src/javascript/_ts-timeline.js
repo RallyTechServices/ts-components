@@ -392,6 +392,7 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
                 inverted: true,
                 marginLeft: vertical_axis_width,
                 type: 'columnrange',
+                zoomType: 'y',
                 events: {
                     load: function(evt) {
                         me._setChart(this);
