@@ -3,11 +3,11 @@
 <head>
     <title>TSAlternativeTimeline</title>
     <!--  (c) 2015,2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Tue Jul 12 2016 21:17:42 GMT-0700 (PDT) -->
+    <!--  Build Date: Tue Jul 12 2016 21:30:01 GMT-0700 (PDT) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Tue Jul 12 2016 21:17:42 GMT-0700 (PDT)";
-        var CHECKSUM = 18332831973;
+        var APP_BUILD_DATE = "Tue Jul 12 2016 21:30:01 GMT-0700 (PDT)";
+        var CHECKSUM = 18743165190;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -664,8 +664,15 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
 
                 columnrange: {
                     dataLabels: {
-                        enabled: false,
-                        formatter: function() { return this.y + "!"; }
+                        enabled: true,
+                        formatter: function() { 
+                            // only show on left;
+                            if ( this.series.name == "Actual" && this.point.low == this.y 
+                                && !Ext.isEmpty(this.point._record.PercentDoneByStoryCount) && this.point.high != this.point.low ) {
+                                return parseInt(this.point._record.PercentDoneByStoryCount * 100) + "%"; 
+                            }
+                            return "";
+                        }
                     }
                 },
                 

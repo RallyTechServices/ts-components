@@ -450,8 +450,15 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
 
                 columnrange: {
                     dataLabels: {
-                        enabled: false,
-                        formatter: function() { return this.y + "!"; }
+                        enabled: true,
+                        formatter: function() { 
+                            // only show on left;
+                            if ( this.series.name == "Actual" && this.point.low == this.y 
+                                && !Ext.isEmpty(this.point._record.PercentDoneByStoryCount) && this.point.high != this.point.low ) {
+                                return parseInt(this.point._record.PercentDoneByStoryCount * 100) + "%"; 
+                            }
+                            return "";
+                        }
                     }
                 },
                 
