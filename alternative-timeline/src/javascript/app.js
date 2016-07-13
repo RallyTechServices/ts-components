@@ -74,7 +74,17 @@ Ext.define("TSAlternativeTimeline", {
             records: records,
             pageSize: 7,
             chartStartDate: this.start,
-            chartEndDate: this.end
+            chartEndDate: this.end,
+            eventsForPlannedItems: {
+                click: function() {
+                    alert(this._record._refObjectName);
+                }
+            },
+            eventsForActualItems: {
+                click: function() {
+                    alert('Actual!');
+                }
+            }
         });
     },
     
