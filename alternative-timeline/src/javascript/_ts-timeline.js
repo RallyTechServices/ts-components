@@ -153,8 +153,6 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
         };
         
         
-        console.log('planned series:', planned_series);
-        
         var actual_series = {
             name: 'Actual',
             data: this._getActualRangesFromItems(records, this.dateCategories)

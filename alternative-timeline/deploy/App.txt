@@ -3,11 +3,11 @@
 <head>
     <title>TSAlternativeTimeline</title>
     <!--  (c) 2015,2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Tue Jul 12 2016 18:15:19 GMT-0700 (PDT) -->
+    <!--  Build Date: Tue Jul 12 2016 18:30:32 GMT-0700 (PDT) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Tue Jul 12 2016 18:15:19 GMT-0700 (PDT)";
-        var CHECKSUM = 18294895791;
+        var APP_BUILD_DATE = "Tue Jul 12 2016 18:30:32 GMT-0700 (PDT)";
+        var CHECKSUM = 18309615127;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -366,8 +366,6 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
             data: this._getPlannedRangesFromItems(records,this.dateCategories)
         };
         
-        
-        console.log('planned series:', planned_series);
         
         var actual_series = {
             name: 'Actual',
@@ -870,19 +868,25 @@ Ext.define("TSAlternativeTimeline", {
             filters: [{property:'PlannedStartDate', operator: '>=', value: start}],
             fetch: ['ObjectID','Name','FormattedID',
                 'PlannedStartDate','PlannedEndDate','ActualStartDate','ActualEndDate',
-                'PercentDoneByStoryCount']
+                'PercentDoneByStoryCount'],
+            limit: 4,
+            pageSize: 4
         };
 
         var release_config = { 
             model: 'Release',
             filters: [{property:'ReleaseStartDate', operator: '>=', value: start}],
-            fetch: ['ObjectID','Name','FormattedID','ReleaseStartDate','ReleaseDate']
+            fetch: ['ObjectID','Name','FormattedID','ReleaseStartDate','ReleaseDate'],
+            limit: 2,
+            pageSize: 2
         };
         
         var iteration_config = { 
             model: 'Iteration',
             filters: [{property:'StartDate', operator: '>=', value: start}],
-            fetch: ['ObjectID','Name','FormattedID','StartDate','EndDate']
+            fetch: ['ObjectID','Name','FormattedID','StartDate','EndDate'],
+            limit: 2,
+            pageSize: 2
         };
         
         Deft.Chain.sequence([

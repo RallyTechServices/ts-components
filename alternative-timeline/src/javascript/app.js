@@ -33,19 +33,25 @@ Ext.define("TSAlternativeTimeline", {
             filters: [{property:'PlannedStartDate', operator: '>=', value: start}],
             fetch: ['ObjectID','Name','FormattedID',
                 'PlannedStartDate','PlannedEndDate','ActualStartDate','ActualEndDate',
-                'PercentDoneByStoryCount']
+                'PercentDoneByStoryCount'],
+            limit: 4,
+            pageSize: 4
         };
 
         var release_config = { 
             model: 'Release',
             filters: [{property:'ReleaseStartDate', operator: '>=', value: start}],
-            fetch: ['ObjectID','Name','FormattedID','ReleaseStartDate','ReleaseDate']
+            fetch: ['ObjectID','Name','FormattedID','ReleaseStartDate','ReleaseDate'],
+            limit: 2,
+            pageSize: 2
         };
         
         var iteration_config = { 
             model: 'Iteration',
             filters: [{property:'StartDate', operator: '>=', value: start}],
-            fetch: ['ObjectID','Name','FormattedID','StartDate','EndDate']
+            fetch: ['ObjectID','Name','FormattedID','StartDate','EndDate'],
+            limit: 2,
+            pageSize: 2
         };
         
         Deft.Chain.sequence([
