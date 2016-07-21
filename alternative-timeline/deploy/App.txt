@@ -3,11 +3,11 @@
 <head>
     <title>TSAlternativeTimeline</title>
     <!--  (c) 2015,2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Wed Jul 20 2016 22:04:41 GMT-0700 (PDT) -->
+    <!--  Build Date: Wed Jul 20 2016 22:34:56 GMT-0700 (PDT) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Wed Jul 20 2016 22:04:41 GMT-0700 (PDT)";
-        var CHECKSUM = 20969109174;
+        var APP_BUILD_DATE = "Wed Jul 20 2016 22:34:56 GMT-0700 (PDT)";
+        var CHECKSUM = 21249332548;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -289,7 +289,12 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
         /*
          * width of the labels for the vertical axis
          */
-        verticalLabelWidth: 200
+        verticalLabelWidth: 200,
+        
+        /*
+         * PercentDoneByStoryCount|PercentDoneByStoryPlanEstimate
+         */
+        percentDoneField: null
     },
 
     initComponent: function() {
@@ -723,9 +728,13 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
                         enabled: true,
                         formatter: function() { 
                             // only show on left;
+                            var field = 'PercentDoneByStoryPlanEstimate';
+                            if ( me.percentDoneField ) {
+                                field = me.percentDoneField;
+                            }
                             if ( this.series.name == "Actual" && this.point.low == this.y 
-                                && !Ext.isEmpty(this.point._record.PercentDoneByStoryCount) && this.point.high != this.point.low ) {
-                                return parseInt(this.point._record.PercentDoneByStoryCount * 100) + "%"; 
+                                && !Ext.isEmpty(this.point._record[field]) && this.point.high != this.point.low ) {
+                                return parseInt(this.point._record[field] * 100) + "%"; 
                             }
                             return "";
                         }
