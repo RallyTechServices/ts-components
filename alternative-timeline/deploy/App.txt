@@ -3,11 +3,11 @@
 <head>
     <title>TSAlternativeTimeline</title>
     <!--  (c) 2015,2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Tue Jul 12 2016 21:40:17 GMT-0700 (PDT) -->
+    <!--  Build Date: Wed Jul 20 2016 21:53:41 GMT-0700 (PDT) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Tue Jul 12 2016 21:40:17 GMT-0700 (PDT)";
-        var CHECKSUM = 19792879620;
+        var APP_BUILD_DATE = "Wed Jul 20 2016 21:53:41 GMT-0700 (PDT)";
+        var CHECKSUM = 20802415703;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -230,6 +230,9 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
         chartEndDate:   Rally.util.DateTime.add(new Date(),'month', 8),
         
         pageSize: 7,
+        
+        /* color defaults to showing on Actuals line */
+        showColorOnPlanned: false, 
         
         /*
          * Override mapping provided by type in the plannedStartMap and plannedEndMap
@@ -461,12 +464,18 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
             var start_index = this._getPositionOnTimeline(categories, item.get(plannedStartField) );
             var end_index   = this._getPositionOnTimeline(categories, item.get(plannedEndField) );
             
-            var colorObject = Rally.util.HealthColorCalculator.calculateHealthColorForPortfolioItemData(item.data, 'PercentDoneByStoryCount');
-
-            if ( Ext.isEmpty(item.get('PercentDoneByStoryCount') ) || item.get('PercentDoneByStoryCount') < 0 ){
-                colorObject = {
-                    hex: '#000',
-                    label: 'Has no Percent Done by Story Count'
+            var colorObject = {
+                hex: '#acacac'
+            };
+            
+            if ( this.showColorOnPlanned ) {
+                var colorObject = Rally.util.HealthColorCalculator.calculateHealthColorForPortfolioItemData(item.data, 'PercentDoneByStoryCount');
+    
+                if ( Ext.isEmpty(item.get('PercentDoneByStoryCount') ) || item.get('PercentDoneByStoryCount') < 0 ){
+                    colorObject = {
+                        hex: '#000',
+                        label: 'Has no Percent Done by Story Count'
+                    }
                 }
             }
              
@@ -501,11 +510,30 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
             if ( Ext.isEmpty(item.get(actualEndField)) ) {
                 end_index = this._getPositionOnTimeline(categories,new Date());
             }
+            
+            var colorObject = {
+                hex: '#acacac'
+            };
+            
+            if ( !this.showColorOnPlanned ) {
+                var colorObject = Rally.util.HealthColorCalculator.calculateHealthColorForPortfolioItemData(item.data, 'PercentDoneByStoryCount');
+    
+                if ( Ext.isEmpty(item.get('PercentDoneByStoryCount') ) || item.get('PercentDoneByStoryCount') < 0 ){
+                    colorObject = {
+                        hex: '#000',
+                        label: 'Has no Percent Done by Story Count'
+                    }
+                }
+            }
+             
             var config = {
+                color: colorObject.hex,
                 low: start_index, 
                 high: end_index ,
+                _status: colorObject.label,
                 _record: item.getData()
             };
+            
             if ( this.eventsForActualItems ) {
                 config.events = this.eventsForActualItems;
             }
@@ -553,7 +581,7 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
                 var to = from + diff - 1;
                 
                 bands.push({
-                    color: '#eee',
+                    color: '#f6f6f6',
                     from: from,
                     to: to,
                     label: {
