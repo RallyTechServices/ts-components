@@ -3,11 +3,11 @@
 <head>
     <title>TSAlternativeTimeline</title>
     <!--  (c) 2015,2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Wed Jul 20 2016 21:53:41 GMT-0700 (PDT) -->
+    <!--  Build Date: Wed Jul 20 2016 22:04:41 GMT-0700 (PDT) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Wed Jul 20 2016 21:53:41 GMT-0700 (PDT)";
-        var CHECKSUM = 20802415703;
+        var APP_BUILD_DATE = "Wed Jul 20 2016 22:04:41 GMT-0700 (PDT)";
+        var CHECKSUM = 20969109174;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -272,6 +272,7 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
         
         allowHorizontalScroll : false, // not yet implemented
         
+       
         /*
          * additionalPlotlines:  push an array of additional plot lines onto the chart
          * 
@@ -284,7 +285,11 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
          *   }]
          * 
          */
-        additionalPlotlines: []
+        additionalPlotlines: [],
+        /*
+         * width of the labels for the vertical axis
+         */
+        verticalLabelWidth: 200
     },
 
     initComponent: function() {
@@ -650,7 +655,7 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
         var me = this;
         
         var max = this.pageSize;
-        var vertical_axis_width = 200;
+        var vertical_axis_width = this.verticalLabelWidth;
         
         var chart_config = {
             chart: {
