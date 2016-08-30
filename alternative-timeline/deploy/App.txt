@@ -3,11 +3,11 @@
 <head>
     <title>TSAlternativeTimeline</title>
     <!--  (c) 2015,2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Wed Jul 20 2016 22:34:56 GMT-0700 (PDT) -->
+    <!--  Build Date: Mon Aug 29 2016 20:10:28 GMT-0700 (PDT) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Wed Jul 20 2016 22:34:56 GMT-0700 (PDT)";
-        var CHECKSUM = 21249332548;
+        var APP_BUILD_DATE = "Mon Aug 29 2016 20:10:28 GMT-0700 (PDT)";
+        var CHECKSUM = 23701210869;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -377,6 +377,11 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
             record.get('FormattedID'),
             record.get('Name')
         );
+    },
+    
+    // override to put on top of category list (vertical x axis)
+    getCategoryHeader: function() {
+        return null;
     },
     
     _processItems: function(records) {
@@ -752,7 +757,29 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
     
     _setChart: function(chart) {
         this.highchart = chart;
+        this._addCategoryHeader(chart);
+        
         this._enableChartButtons();
+    },
+    
+    _addCategoryHeader: function(chart) {
+        var string = this.getCategoryHeader();
+        if ( !Ext.isEmpty(string) ) {
+            var x = 0;
+            var y = 0;
+            var shape = 'rect';
+            var anchorX = null;
+            var anchorY = null;
+            var useHTML = true;
+            
+            var label = chart.renderer.label(string,x,y,shape,anchorX,anchorY,useHTML).add();
+            
+            label.align({
+                align: 'left',
+                x: 0,
+                y: 0
+            });
+        }
     },
     
     _enableChartButtons: function() {
@@ -989,6 +1016,9 @@ Ext.define("TSAlternativeTimeline", {
             pageSize: 7,
             chartStartDate: this.start,
             chartEndDate: this.end,
+            getCategoryString: this._getCategoryString,
+            getCategoryHeader: this._getCategoryHeader,
+            
             eventsForPlannedItems: {
                 click: function() {
                     alert(this._record._refObjectName);
@@ -1007,6 +1037,28 @@ Ext.define("TSAlternativeTimeline", {
             
             }]
         });
+    },
+    
+    _getCategoryHeader: function(){
+        var html = "<table><tr>";
+        
+        html += Ext.String.format("<td class='ts-timeline-category-cell' style='width:75px'>{0}</td>",'One');
+        html += Ext.String.format("<td class='ts-timeline-category-cell' style='width:100px'>{0}</td>",'Two');
+        
+        html += "</tr></table>";
+
+        return html;
+    },
+    
+    _getCategoryString: function(record) {
+        var html = "<table><tr>";
+        
+        html += Ext.String.format("<td class='ts-timeline-category-cell' style='width:75px'>{0}</td>",record.get('Name'));
+        html += Ext.String.format("<td class='ts-timeline-category-cell' style='width:100px'>{0}</td>",record.get('Name'));
+        
+        html += "</tr></table>";
+
+        return html;
     },
     
     _loadWsapiRecords: function(config){
@@ -1085,6 +1137,14 @@ Ext.define("TSAlternativeTimeline", {
 }
 .x-border-layout-ct {
     background-color: white;
+}
+
+.ts-timeline-category-cell {
+    padding-left: 5px;
+    padding-right: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
 }
     </style>
 

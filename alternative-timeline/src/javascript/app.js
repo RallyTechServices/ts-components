@@ -81,6 +81,9 @@ Ext.define("TSAlternativeTimeline", {
             pageSize: 7,
             chartStartDate: this.start,
             chartEndDate: this.end,
+            getCategoryString: this._getCategoryString,
+            getCategoryHeader: this._getCategoryHeader,
+            
             eventsForPlannedItems: {
                 click: function() {
                     alert(this._record._refObjectName);
@@ -99,6 +102,28 @@ Ext.define("TSAlternativeTimeline", {
             
             }]
         });
+    },
+    
+    _getCategoryHeader: function(){
+        var html = "<table><tr>";
+        
+        html += Ext.String.format("<td class='ts-timeline-category-cell' style='width:75px'>{0}</td>",'One');
+        html += Ext.String.format("<td class='ts-timeline-category-cell' style='width:100px'>{0}</td>",'Two');
+        
+        html += "</tr></table>";
+
+        return html;
+    },
+    
+    _getCategoryString: function(record) {
+        var html = "<table><tr>";
+        
+        html += Ext.String.format("<td class='ts-timeline-category-cell' style='width:75px'>{0}</td>",record.get('Name'));
+        html += Ext.String.format("<td class='ts-timeline-category-cell' style='width:100px'>{0}</td>",record.get('Name'));
+        
+        html += "</tr></table>";
+
+        return html;
     },
     
     _loadWsapiRecords: function(config){
