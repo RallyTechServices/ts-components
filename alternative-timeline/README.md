@@ -4,10 +4,14 @@
 
 A timeline built using Highcharts instead of the gantt thing that the thing in the product uses.  When this is mature, it should be much easier to write/create timeline style things.
 
+Be sure to modify your html tpl file to include
+
+    <!-- our highcharts (needed so that we can add patterns) -->
+    <script type="text/javascript" src="/apps/<%= sdk %>/lib/analytics/analytics-all.js"></script>
+
+
 TODO:
-* pass function for clicking on bars
 * hovers
-* milestones
 * horizontal scrolling
 * zoom
 * hierarchy/tree -- probably not possible in this incarnation
