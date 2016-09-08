@@ -9,9 +9,9 @@ Be sure to modify your html tpl file to include
     <!-- our highcharts (needed so that we can add patterns) -->
     <script type="text/javascript" src="/apps/<%= sdk %>/lib/analytics/analytics-all.js"></script>
 
+Use allowVerticalScroll = false to have the chart try to fill the page at 50px per line.  allowVerticalScroll = true puts the buttons on the chart for scrolling with the pagesize and height you choose.
 
 TODO:
-* hovers
 * horizontal scrolling
 * zoom
 * hierarchy/tree -- probably not possible in this incarnation

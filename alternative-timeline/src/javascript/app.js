@@ -51,7 +51,7 @@ Ext.define("TSAlternativeTimeline", {
             filters: [{property:'StartDate', operator: '>=', value: start}],
             fetch: ['ObjectID','Name','FormattedID','StartDate','EndDate'],
             limit: 2,
-            pageSize: 2
+            pageSize: 25
         };
         
         Deft.Chain.sequence([
@@ -76,6 +76,8 @@ Ext.define("TSAlternativeTimeline", {
         this.down('#display_box').add({
             xtype: 'tsalternativetimeline',
             height: 500,
+            allowVerticalScroll: false,
+            
             width: this.getWidth() - 20,
             records: records,
             pageSize: 7,
