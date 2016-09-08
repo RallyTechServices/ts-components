@@ -3,11 +3,11 @@
 <head>
     <title>TSAlternativeTimeline</title>
     <!--  (c) 2015,2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Mon Aug 29 2016 21:04:46 GMT-0700 (PDT) -->
+    <!--  Build Date: Wed Sep 07 2016 19:53:28 GMT-0700 (PDT) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Mon Aug 29 2016 21:04:46 GMT-0700 (PDT)";
-        var CHECKSUM = 32224153032;
+        var APP_BUILD_DATE = "Wed Sep 07 2016 19:53:28 GMT-0700 (PDT)";
+        var CHECKSUM = 33997862691;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -781,7 +781,11 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
         
         Ext.Array.each( _.range(0,range), function(index) {
             var from_date = Rally.util.DateTime.add(me.chartStartDate, 'day', index);
-            var month_name = Ext.Date.format(from_date, 'M');
+            var month_name = Ext.String.format(
+                "<div class='ts-month-title'>{0}<br/>{1}</div>",
+                Ext.Date.format(from_date, 'M'),
+                Ext.Date.format(from_date, 'Y')
+            );
             if ( month_name != header ) { 
                 header = month_name;
                 var from = index;
@@ -797,13 +801,14 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
                     label: {
                         text: header,
                         align: 'center',
-                        y: -2
+                        useHTML: true,
+                        y: -5
                     },
                     zIndex: 3
                 });
             }
         });
-        
+       
 //        var bands = Ext.Array.map( _.range(0,12), function(index) {
 //            var band_start_date = Rally.util.DateTime.add(start_date, 'month', index);
 //            var band_end_date = Rally.util.DateTime.add(band_start_date, 'month', 1);
@@ -866,6 +871,7 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
             chart: {
                 inverted: true,
                 marginLeft: vertical_axis_width,
+                marginTop: 18,
                 type: 'columnrange',
                 zoomType: 'y',
                 events: {
@@ -932,11 +938,38 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
                             if ( me.percentDoneField ) {
                                 field = me.percentDoneField;
                             }
+                            
+                            var display_text = "";
+                            
+                            if ( this.point.low == this.y ) {
+                                var start_field = "PlannedStartDate";
+                                if ( this.series.name == "Actual" ) {
+                                    start_field = "ActualStartDate";
+                                }
+                                
+                                if ( !Ext.isEmpty(this.point._record[start_field]) ) {
+                                    display_text += Ext.util.Format.date(this.point._record[start_field], 'd-M');
+                                }
+                            }
+                            
+                            if ( this.point.high == this.y ) {
+                                var start_field = "PlannedEndDate";
+                                if ( this.series.name == "Actual" ) {
+                                    start_field = "ActualEndDate";
+                                }
+                                
+                                if ( !Ext.isEmpty(this.point._record[start_field]) ) {
+                                    display_text += Ext.util.Format.date(this.point._record[start_field], 'd-M');
+                                }
+                            }
+                            
                             if ( this.series.name == "Actual" && this.point.low == this.y 
                                 && !Ext.isEmpty(this.point._record[field]) && this.point.high != this.point.low ) {
-                                return parseInt(this.point._record[field] * 100) + "%"; 
+                                    display_text += Ext.String.format(" ({0}%)",
+                                        parseInt(this.point._record[field] * 100)
+                                    );
                             }
-                            return "";
+                            return display_text;
                         }
                     }
                 },
@@ -1340,6 +1373,10 @@ Ext.define("TSAlternativeTimeline", {
     overflow: hidden;
     text-overflow: ellipsis;
     display: inline-block;
+}
+
+.ts-month-title {
+	text-align: center;
 }
     </style>
 

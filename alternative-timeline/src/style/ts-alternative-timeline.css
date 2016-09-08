@@ -9,3 +9,7 @@
     text-overflow: ellipsis;
     display: inline-block;
 }
+
+.ts-month-title {
+	text-align: center;
+}
