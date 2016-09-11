@@ -3,11 +3,11 @@
 <head>
     <title>TSAlternativeTimeline</title>
     <!--  (c) 2015,2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Wed Sep 07 2016 20:32:27 GMT-0700 (PDT) -->
+    <!--  Build Date: Sun Sep 11 2016 14:29:07 GMT-0700 (PDT) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Wed Sep 07 2016 20:32:27 GMT-0700 (PDT)";
-        var CHECKSUM = 35111841586;
+        var APP_BUILD_DATE = "Sun Sep 11 2016 14:29:07 GMT-0700 (PDT)";
+        var CHECKSUM = 35142465750;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -961,9 +961,9 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
                             var display_text = "";
                             
                             if ( this.point.low == this.y ) {
-                                var start_field = "PlannedStartDate";
+                                var start_field = me.plannedStartField;
                                 if ( this.series.name == "Actual" ) {
-                                    start_field = "ActualStartDate";
+                                    start_field = me.actualStartField;
                                 }
                                 
                                 if ( !Ext.isEmpty(this.point._record[start_field]) ) {
@@ -972,9 +972,9 @@ Ext.define('CA.technicalservices.AlternativeTimeline',{
                             }
                             
                             if ( this.point.high == this.y ) {
-                                var start_field = "PlannedEndDate";
+                                var start_field = me.plannedEndField;
                                 if ( this.series.name == "Actual" ) {
-                                    start_field = "ActualEndDate";
+                                    start_field = me.actualEndField;
                                 }
                                 
                                 if ( !Ext.isEmpty(this.point._record[start_field]) ) {
