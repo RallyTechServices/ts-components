@@ -388,29 +388,15 @@ Ext.override(Rally.data.wsapi.ParentChildMapper, {
 
 Ext.define('Rally.data.wsapi.ProjectTreeStore', {
 
-    // Client Metrics Note: WsapiTreeStore is too low level to record its load begins/ends. The problem is
-    // client metrics can only reliably keep track of one load per component at a time. WsapiTreeStore makes
-    // no guarantee that only one load will happen at a time. It's better to measure the component that is using
-    // the store. All is not lost, the actual data requests that WsapiTreeStore makes *are* measured by client metrics.
-
-    requires: [
-        'Deft.promise.Deferred',
-        'Rally.data.ModelFactory',
-        'Rally.ui.grid.data.NodeInterface',
-        'Rally.data.ModelTypes',
-        'Rally.data.wsapi.ParentChildMapper'
-    ],
     extend: 'Rally.data.wsapi.TreeStore',
     alias: 'store.rallyprojectwsapitreestore',
-
-    autoSync: true,
     
     /**
      * The type definition typePaths to render as root items (required)
      * @cfg {String[]} parentTypes
      */
     parentTypes: ['project'],
-
+    
     /**
      * @property
      * @private
@@ -421,26 +407,79 @@ Ext.define('Rally.data.wsapi.ProjectTreeStore', {
     }],
         
     getParentFieldNamesByChildType: function(childType, parentType) {
-        var model = this.model; //.getArtifactComponentModel(childType);
-        return _.transform(this.mapper.getParentFields(childType, parentType), function(acc, field) {
-            var typePath = field.typePath,
-                fieldName = field.fieldName,
-            // hasFieldModel = this.model.getArtifactComponentModel(typePath) || model.hasField(fieldName);
-                hasFieldModel = model.hasField(fieldName);
+        return ['Parent'];
+    },
 
-            if (hasFieldModel) {
-                acc.push(fieldName.replace(/\s+/g, ''));
-            }
-        }, [], this);
+    _getChildNodeFilters: function(node) {
+        var parentType = node.self.typePath,
+            childTypes = this._getChildTypePaths([parentType]),
+            parentFieldNames = this._getParentFieldNames(childTypes, parentType);
+
+        var filter = [];
+        if (parentFieldNames.length) {
+            filter =  [
+                Rally.data.wsapi.Filter.or(_.map(parentFieldNames, function(parentFieldName) {
+                    return {
+                        property: parentFieldName,
+                        operator: '=',
+                        value: node.get('_ref')
+                    };
+                }))
+            ];
+        }
+
+        return filter;
     },
 
     filter: function(filters) {
+        console.log('--');
         this.fireEvent('beforefilter', this);
         //We need to clear the filters to remove the Parent filter
         this.filters.clear();
         this.filters.addAll(filters);
         this._resetCurrentPage();
         this.load();
+    },
+    
+    load: function(options) {
+        this.recordLoadBegin({description: 'tree store load', component: this.requester});
+
+        this._hasErrors = false;
+
+        this.on('beforeload', function(store, operation) {
+            delete operation.id;
+        }, this, { single: true });
+
+        options = this._configureLoad(options);
+        options.originalCallback = options.callback;
+        var deferred = Ext.create('Deft.Deferred'),
+            me = this;
+
+        options.callback = function (records, operation, success) {
+            me.dataLoaded = true;
+
+            if (me._pageIsEmpty(operation)) {
+                me._reloadEmptyPage(options).then({
+                    success: function (records) {
+                        // this gives a maximum callstack exceeded error.  don't know why
+                        //me._resolveLoadingRecords(deferred, records, options, operation, success);
+                    },
+                    failure: function() {
+                        me._rejectLoadingRecord(deferred, options, operation);
+                    }
+                });
+            } else {
+                //me._resolveLoadingRecords(deferred, records, options, operation, success);
+            }
+        };
+
+        if (this._isViewReady()) {
+            this._beforeInitialLoad(options);
+        }
+
+        this.callParent([options]);
+
+        return deferred.promise;
     },
 
     clearFilter: function(suppressEvent) {
@@ -462,9 +501,6 @@ Ext.define('Rally.data.wsapi.ProjectTreeStoreBuilder', {
     extend: 'Rally.data.wsapi.TreeStoreBuilder',
 
     build: function(config) {
-        //A context needs to be passed in here, and it NEEDS to be a DataContext (context.getDataContext())
-        //otherwise you will get a bunch of garbage on your WSAPI request
-
         config = _.clone(config || {});
         config.storeType = 'Rally.data.wsapi.ProjectTreeStore';
 
@@ -475,5 +511,9 @@ Ext.define('Rally.data.wsapi.ProjectTreeStoreBuilder', {
             },
             scope: this
         });
+    },
+
+    _useCompositeArtifacts: function (models, config) {
+        return false;
     }
 });
