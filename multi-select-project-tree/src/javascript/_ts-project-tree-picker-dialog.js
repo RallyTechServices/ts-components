@@ -17,7 +17,14 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
          * Title to give to the dialog
          */
         title: 'Choose Project(s)',
-
+        /**
+         * 
+         * @cfg {String} introText
+         * 
+         *  Informational text to include on the dialog.
+         */
+        introText: null,
+        
         /**
          * @cfg {Boolean}
          * Allow multiple selection or not
@@ -71,14 +78,9 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
         gridConfig: {},
 
         /**
-         * @cfg {String}|{String[]}
-         * The ref(s) of items which should be selected when the chooser loads
-         */
-        selectedRecords: undefined,
-
-        /**
-         * @cfg {Array}
-         * The records to select when the chooser loads
+         * @cfg {Object[] || Rally.data.wsapi.Model[]}  initialSelectedRecords
+         * The records to select when the chooser loads.  Provide either configuration objects
+         * (with at lease { _ref: xxx } defined) or models
          */
         initialSelectedRecords: undefined,
 
@@ -285,8 +287,9 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
     },
 
     _findRecordInSelectionCache: function(record){
+        var me = this;
         return _.findIndex(this.selectionCache, function(cachedRecord) {
-            return cachedRecord.get('_ref') === record.get('_ref');
+            return me._specialGet(cachedRecord,'_ref') === me._specialGet(record,'_ref');
         });
     },
 
@@ -325,16 +328,30 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
         this._onGridLoad();
         this.center();
     },
+    
+    _specialGet: function(item, field) {
+        if ( Ext.isEmpty(item) ) { 
+            return null;
+        }
+        
+        if ( Ext.isFunction(item.get) ) { 
+            return item.get(field);
+        }
+        
+        return item[field];
+    },
+    
     _onGridLoad: function() {
         var store = this.grid.store;
         var records = [];
         Ext.Array.each(this.selectionCache, function(record) {
-            var foundNode = store.getRootNode().findChild('_ref', record.get('_ref'),true);
+            var ref = this._specialGet(record,'_ref');
+            var foundNode = store.getRootNode().findChild('_ref',ref,true);
 
             if (foundNode) {
                 records.push(foundNode);
             }
-        });
+        },this);
         if (records.length) {
             this.grid.getSelectionModel().select(records);
         }

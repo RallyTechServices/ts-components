@@ -12,19 +12,49 @@ Ext.define("TSMultiProjectTreeSelector", {
         name : "TSMultiProjectTreeSelector"
     },
 
+    projects: [],
+    
+    stateful: true,
+    stateId: 'TSMultiProjectTreeSelector.1',
+    
+    getState: function() {
+        console.log(this.projects);
+        return {
+            projects: this.projects
+        };
+    },
+
+    applyState: function(state) {
+        console.log('state', state);
+        this.callParent(arguments);
+        if(state.hasOwnProperty('projects')) {
+            this.projects = state.projects;
+        }
+    },
     
     launch: function() {
-
+        this.logger.log('projects:', this.projects);
+        
         Ext.create('CA.technicalservices.ProjectTreePickerDialog',{
             autoShow: true,
             title: 'Choose Project(s)',
-            //selectedRefs: _.pluck(data, 'projectRef'),
+            initialSelectedRecords: this.projects,
+            introText: 'Some text here',
             listeners: {
                 scope: this,
                 itemschosen: function(items){
+                    // save the data rep of each project (because preferences can
+                    // choke on an an instantiated class
+                    this.projects = Ext.Array.map(items, function(item){
+                        if ( Ext.isFunction(item.getData) ) {
+                            item = item.getData();
+                        }
+                        return item;
+                    });
                     
                     this.logger.log("selected: ", items);
-                    
+                    this.logger.log('--', this.projects);
+                    this.saveState();
                 }
             }
         });
