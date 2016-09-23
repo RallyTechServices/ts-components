@@ -11,7 +11,8 @@ Ext.define("TSMultiProjectTreeSelector", {
     integrationHeaders : {
         name : "TSMultiProjectTreeSelector"
     },
-                        
+
+    
     launch: function() {
 
         Ext.create('CA.technicalservices.ProjectTreePickerDialog',{

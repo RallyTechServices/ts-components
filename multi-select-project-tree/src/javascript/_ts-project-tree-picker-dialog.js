@@ -44,7 +44,7 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
             },
             sorters: [
                 {
-                    property: 'FormattedID',
+                    property: 'Name',
                     direction: 'DESC'
                 }
             ]
@@ -233,7 +233,8 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
             models: ['project'],
             autoLoad: true,
             enableHierarchy: true,
-            filters: me.root_filters
+            filters: me.root_filters,
+            sorters: [{property:'Name'}]
         }).then({
             scope: this,
             success: function(store) {

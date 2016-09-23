@@ -3,13 +3,13 @@
 <head>
     <title>TSMultiProjectTreeSelector</title>
     <!--  (c) 2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Thu Sep 15 2016 20:20:51 GMT-0700 (PDT) -->
+    <!--  Build Date: Thu Sep 22 2016 17:57:17 GMT-0700 (PDT) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Thu Sep 15 2016 20:20:51 GMT-0700 (PDT)";
+        var APP_BUILD_DATE = "Thu Sep 22 2016 17:57:17 GMT-0700 (PDT)";
         var STORY    = "";
         var BUILDER  = "jmartin";
-        var CHECKSUM = 11884867231;
+        var CHECKSUM = 12125630839;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -236,6 +236,15 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
          * Allow multiple selection or not
          */
         multiple: true,
+        
+        /**
+         * @cfg {Object}  || Rally.data.wsapi.Filter[]  
+         * Name of top project to start building the tree down through the hierarchy.
+         */
+        root_filters: [{
+                property: 'Parent',
+                value: ""
+        }],
 
         /**
          * @cfg {Object}
@@ -248,7 +257,7 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
             },
             sorters: [
                 {
-                    property: 'FormattedID',
+                    property: 'Name',
                     direction: 'DESC'
                 }
             ]
@@ -437,10 +446,8 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
             models: ['project'],
             autoLoad: true,
             enableHierarchy: true,
-            filters: [{
-                property: 'Parent',
-                value: ""
-            }]
+            filters: me.root_filters,
+            sorters: [{property:'Name'}]
         }).then({
             scope: this,
             success: function(store) {
@@ -743,7 +750,8 @@ Ext.define("TSMultiProjectTreeSelector", {
     integrationHeaders : {
         name : "TSMultiProjectTreeSelector"
     },
-                        
+
+    
     launch: function() {
 
         Ext.create('CA.technicalservices.ProjectTreePickerDialog',{
