@@ -23,6 +23,15 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
          * Allow multiple selection or not
          */
         multiple: true,
+        
+        /**
+         * @cfg {Object}  || Rally.data.wsapi.Filter[]  
+         * Name of top project to start building the tree down through the hierarchy.
+         */
+        root_filters: [{
+                property: 'Parent',
+                value: ""
+        }],
 
         /**
          * @cfg {Object}
@@ -224,10 +233,7 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
             models: ['project'],
             autoLoad: true,
             enableHierarchy: true,
-            filters: [{
-                property: 'Parent',
-                value: ""
-            }]
+            filters: me.root_filters
         }).then({
             scope: this,
             success: function(store) {
