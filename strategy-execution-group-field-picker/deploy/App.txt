@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TS Strategy Execution Project Picker</title>
+    <!--  (c) 2016 CA Technologies.  All Rights Reserved. -->
+    <!--  Build Date: Sat Nov 19 2016 18:08:42 GMT-0800 (PST) -->
+    
+    <script type="text/javascript">
+        var APP_BUILD_DATE = "Sat Nov 19 2016 18:08:42 GMT-0800 (PST)";
+        var STORY    = "None";
+        var BUILDER  = "jmartin";
+        var CHECKSUM = 7984740859;
+    </script>
+    
+    <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
+    <!-- our highcharts (needed so that we can add patterns) -->
+    <script type="text/javascript" src="/apps/2.1/lib/analytics/analytics-all.js"></script>
+
+    <script type="text/javascript">
+        Rally.onReady(function() {
+             
+/**
+ * A link that pops up a version dialog box
+ */
+
+Ext.define('Rally.technicalservices.InfoLink',{
+    extend: 'Rally.ui.dialog.Dialog',
+    alias: 'widget.tsinfolink',
+    
+    /**
+     * @cfg {String} informationHtml
+     * Additional text to be displayed on the popup dialog (for exmaple,
+     * to add a description of the app's use or functionality)
+     */
+    informationHtml: null,
+    
+    /**
+     * 
+     * cfg {String} title
+     * The title for the dialog box
+     */
+    title: "Build Information",
+    
+    defaults: { padding: 5, margin: 5 },
+
+    closable: true,
+     
+    draggable: true,
+
+    autoShow: true,
+   
+    width: 350,
+    
+    informationalConfig: null,
+    
+    items: [{xtype:'container', itemId:'information' }],
+    
+    initComponent: function() {
+        var id = Ext.id(this);
+        this.title =  "<span class='icon-help'> </span>" + this.title;
+        this.callParent(arguments);
+    },
+    
+    _generateChecksum: function(string){
+        var chk = 0x12345678,
+            i;
+        string = string.replace(/var CHECKSUM = .*;/,"");
+        string = string.replace(/var BUILDER  = .*;/,"");
+        string = string.replace(/\s/g,"");  //Remove all whitespace from the string.
+       
+        for (i = 0; i < string.length; i++) {
+            chk += (string.charCodeAt(i) * i);
+        }
+   
+        return chk;
+    },
+    
+    _checkChecksum: function(container) {
+        var deferred = Ext.create('Deft.Deferred');
+        var me = this;
+        
+        Ext.Ajax.request({
+            url: document.URL,
+            params: {
+                id: 1
+            },
+            success: function (response) {
+                text = response.responseText;
+                if ( CHECKSUM ) {
+                    var stored_checksum = me._generateChecksum(text);
+                    if ( CHECKSUM !== stored_checksum ) {
+                        deferred.resolve(false);
+                        return;
+                    }
+                }
+                deferred.resolve(true);
+            }
+        });
+        
+        return deferred.promise;
+    },
+    
+    _addToContainer: function(container){
+        var config = Ext.apply({
+            xtype:'container',
+            height: 200,
+            overflowY: true
+        }, this.informationalConfig);
+        
+        container.add(config);
+    },
+    
+    afterRender: function() {
+        var app = Rally.getApp();
+        
+        if ( !Ext.isEmpty( this.informationalConfig ) ) {
+            var container = this.down('#information');
+            this._addToContainer(container);
+            
+        }
+        
+        if (! app.isExternal() ) {
+            this._checkChecksum(app).then({
+                scope: this,
+                success: function(result){
+                    if ( !result ) {
+                        this.addDocked({
+                            xtype:'container',
+                            cls: 'build-info',
+                            dock: 'bottom',
+                            padding: 2,
+                            html:'<span class="icon-warning"> </span>Checksums do not match'
+                        });
+                    }
+                },
+                failure: function(msg){
+                    console.log("oops:",msg);
+                }
+            });
+        } else {
+            this.addDocked({
+                xtype:'container',
+                cls: 'build-info',
+                padding: 2,
+                dock: 'bottom',
+                html:'... Running externally'
+            });
+        }
+        this.callParent(arguments);
+    },
+    
+    beforeRender: function() {
+        var me = this;
+        this.callParent(arguments);
+
+        if (this.informationHtml) {
+            this.addDocked({
+                xtype: 'component',
+                componentCls: 'intro-panel',
+                padding: 2,
+                html: this.informationHtml,
+                doc: 'top'
+            });
+        }
+        
+        this.addDocked({
+            xtype:'container',
+            cls: 'build-info',
+            padding: 2,
+            dock:'bottom',
+            html:"This app was created by the CA AC Technical Services Team."
+        });
+        
+        if ( APP_BUILD_DATE ) {
+            var build_html = Ext.String.format("Built on: {0} <br/>Built by: {1}",
+                APP_BUILD_DATE,
+                BUILDER);
+                
+            if ( STORY ) {
+                build_html = build_html + "<br/>Source story: " + STORY;
+            }
+                
+            this.addDocked({
+                xtype:'container',
+                cls: 'build-info',
+                padding: 2,
+                dock: 'bottom',
+                html: build_html
+            });
+        }
+    }
+});
+
+/*
+ */
+Ext.define('Rally.technicalservices.Logger',{
+    constructor: function(config){
+        Ext.apply(this,config);
+    },
+    log: function(args){
+        var timestamp = "[ " + Ext.util.Format.date(new Date(), "Y-m-d H:i:s.u") + " ]";
+        //var output_args = arguments;
+        //output_args.unshift( [ "[ " + timestamp + " ]" ] );
+        //output_args = Ext.Array.push(output_args,arguments);
+        
+        var output_args = [];
+        output_args = Ext.Array.push(output_args,[timestamp]);
+        output_args = Ext.Array.push(output_args, Ext.Array.slice(arguments,0));
+
+        window.console && console.log.apply(console,output_args);
+    }
+
+});
+
+Ext.define('CA.agile.technicalservices.StrategyExecutionGroupSettingsField',{
+    extend: 'Ext.form.field.Base',
+    alias: 'widget.tsstrategyexecutiongroupsettingsfield',
+    fieldSubTpl: '<div id="{id}" class="settings-grid"></div>',
+
+    cls: 'column-settings',
+    
+    config: {
+        height: 150,
+        width: 500,
+        
+        /*
+         * Name to display at the top of the grid column that shows the execution project
+         * (E.g., might want to display this as "Delivery" or "Delivery Teams")
+         */
+        executionColumnDisplayName: 'Execution',
+        /*
+         * Name to display at the top of the grid column that shows the strategy project
+         */
+         strategyColumnDisplayName: 'Strategy',
+        /*
+         * Name to display at the top of the grid column that shows the user's choice for group name
+         */
+        groupColumnDisplayName: 'Group Name',
+        
+        emptyText: 'No Selections'
+        
+    },
+    
+    labelAlign: 'top',
+    
+    onRender: function() {
+        this.callParent(arguments);
+        
+        var decoded_value = [],
+            data = [];
+        
+        if (this.initialConfig && this.initialConfig.value && !_.isEmpty(this.initialConfig.value)){
+            if (!Ext.isObject(this.initialConfig.value)){
+                decoded_value = Ext.JSON.decode(this.initialConfig.value);
+            } else {
+                decoded_value = this.initialConfig.value;
+            }
+        }
+        if ( Ext.isArray(decoded_value) ) { data = decoded_value; }
+        
+        this._store = Ext.create('Ext.data.Store', {
+            fields: ['groupName','strategyProjectName','strategyProjectRef',
+                    'executionProjectName','executionProjectRef'],
+            data: data
+        });
+        
+        var container_width = this.config.width || 500; 
+        if ( container_width < 400 ) { container_width = 400; }
+        var container_height = this.config.height || 150; 
+        if ( container_height < 150 ) { container_height = 150; }
+        
+        var container = Ext.create('Ext.container.Container',{
+            layout: { type:'hbox' },
+            renderTo: this.inputEl,
+            width: container_width,
+            height: container_height,
+            margin: 5
+        });
+        
+        this._createGrid(container);
+        this._createButton(container);
+        this.fireEvent('ready', true);
+    },
+    
+    setValue: function(value) {
+        this.callParent(arguments);
+        this._value = value;
+    },
+    /**
+     * When a form asks for the data this field represents,
+     * give it the name of this field and an array of objects representing the groups.
+     * 
+     * Used when persisting the value of this field.
+     * @return {Object}
+     */
+    getSubmitData: function() {
+        var data = {};
+        data[this.name] = Ext.JSON.encode(this._buildSettingValue());
+        return data;
+    },
+    
+    _createGrid: function(container) {
+        var gridWidth = Math.min(container.getWidth(true)-125,400);
+        
+        this._grid = container.add({
+            xtype:'rallygrid',
+            width: gridWidth,
+            columnCfgs: this._getColumnCfgs(),
+            showPagingToolbar: false,
+            showRowActionsColumn: false,
+            enableRanking: false,
+            store: this._store,
+            emptyText: this.emptyText || 'No Selections',
+            editingConfig: {
+                publishMessages: false
+            }
+        });
+    },
+    
+    _createButton: function(container) {
+        
+        container.add({
+            xtype: 'rallybutton',
+            text: 'Add Group',
+            margin: '0 0 0 10',
+            listeners: {
+                scope: this,
+                click: function(){
+                    var store = this._grid.getStore();
+                    Ext.create('CA.agile.technicalservices.StrategyExecutionPickerDialog',{
+                        strategyLabel: 'Strategy',
+                        executionLabel: 'Execution',
+                        groupLabel: 'Group Name',
+                        
+                        listeners: {
+                            scope: this,
+                            select: function(dialog,value) {
+                                if ( Ext.isEmpty(value) ) { return; }
+                                
+                                var group_name = value.groupName;
+                                var strategy_project = value.strategyProject;
+                                var execution_project = value.executionProject;
+
+                                store.add({
+                                    groupName: group_name,
+                                    strategyProjectName: strategy_project.get('_refObjectName'),
+                                    strategyProjectRef: strategy_project.get('_ref'),
+                                    executionProjectName: execution_project.get('_refObjectName'),
+                                    executionProjectRef: execution_project.get('_ref')
+                                });                                
+                            }
+                        }
+                    });
+
+                    
+                }
+            }
+        });
+    },
+    
+    _buildSettingValue: function() {
+        var mappings = [];
+        var store = this._grid.getStore();
+        
+        store.each(function(record){
+            if ( record.get('strategyProjectRef') ) {
+                mappings.push(record.getData());
+            }
+        });
+        
+        return mappings;
+    },
+    
+    _removeProject: function(){
+        this.grid.getStore().remove(this.record);
+    },
+    
+    _getColumnCfgs: function() {
+        var me = this;
+        return [{
+            xtype: 'rallyrowactioncolumn',
+            scope: this,
+            rowActionsFn: function(record){
+                return  [
+                    {text: 'Remove', record: record, handler: me._removeProject, grid: me._grid }
+                ];
+            }
+        },
+        { 
+            dataIndex: 'groupName',
+            text: this.groupColumnDisplayName
+        },
+        {
+            dataIndex: 'strategyProjectName',
+            text: this.strategyColumnDisplayName,
+            flex: 1
+        },
+        {
+            dataIndex: 'executionProjectName',
+            text: this.executionColumnDisplayName,
+            flex: 1
+        }];
+    },
+    
+    onDestroy: function() {
+        if (this._grid) { 
+            this._grid.destroy();
+            delete this._grid;
+        }
+        this.callParent(arguments);
+    }
+});
+Ext.define('CA.agile.technicalservices.StrategyExecutionPickerDialog',{
+    extend: 'Rally.ui.dialog.Dialog',
+    alias: 'widget.tsstrategyexecutiondialog',
+    
+    config: {
+        autoShow: true,
+        width: 200,
+        height: 200,
+        closable: false,
+        draggable: true,
+        
+        title: 'Choose Projects',
+        
+        selectionButtonText: 'Done',
+        strategyLabel: 'Strategy',
+        executionLabel: 'Execution',
+        groupLabel: 'Group Name'
+    },
+    
+    constructor: function(config) {
+        this.mergeConfig(config);
+        this.callParent([this.config]);
+    },
+    
+        
+    initComponent: function() {
+        this.callParent(arguments);
+        
+        this.addEvents(
+            /**
+             * @event select
+             * Fires when user clicks the done button after choosing the projects
+             * @param {CA.agile.technicalservices.StrategyExecutionPickerDialog} source the dialog
+             * @param {Object} the name, strategy project and execution project chosen.  Looks like:
+             *   { groupName: {String}, strategyProject: {Rally.data.wsapi.Model}, executionProject: {Rally.data.wsapi.Model} }
+             */
+            'select'
+        );
+
+        this.addCls(['chooserDialog', 'chooser-dialog']);
+    },
+    
+    beforeRender: function() {
+        this.callParent(arguments);
+        
+        this.addDocked({
+            xtype: 'toolbar',
+            dock: 'bottom',
+            padding: '0 0 10 0',
+            layout: {
+                type: 'hbox',
+                pack: 'center'
+            },
+            ui: 'footer',
+            items: [
+                {
+                    xtype: 'rallybutton',
+                    itemId: 'doneButton',
+                    text: this.selectionButtonText,
+                    cls: 'primary rly-small',
+                    scope: this,
+                    disabled: true,
+                    userAction: 'clicked done in dialog',
+                    handler: function() {
+                        this.fireEvent('select', this, this.getSelectedValues());
+                        this.close();
+                    }
+                },
+                {
+                    xtype: 'rallybutton',
+                    text: 'Cancel',
+                    cls: 'secondary rly-small',
+                    handler: this.close,
+                    scope: this,
+                    ui: 'link'
+                }
+            ]
+        });
+
+        if (this.introText) {
+            this.addDocked({
+                xtype: 'component',
+                componentCls: 'intro-panel',
+                html: this.introText
+            });
+        }
+        
+        var container = this.add({
+            xtype: 'container',
+            itemId: 'selector_box'
+        });
+
+        this.addSelectors(container);
+    },
+
+    addSelectors: function(container) {
+        container.removeAll();
+        
+        this.group_name_field = container.add({
+            xtype: 'rallytextfield',
+            fieldLabel: this.groupLabel,
+            labelAlign: 'top',
+            margin: 5,
+            listeners: {
+                scope: this,
+                change: this._enableDisableDoneButton
+            }
+        });
+        
+        this.strategy_selector = container.add({
+            xtype: 'rallyprojectpicker',
+            showMostRecentlyUsedProjects: false,
+            workspace: Rally.getApp().getContext().getWorkspaceRef(),
+            fieldLabel: this.strategyLabel,
+            labelAlign: 'top',
+            margin: 5,
+            listeners: {
+                scope: this,
+                change: this._enableDisableDoneButton
+            }
+        });
+        
+        this.execution_selector = container.add({
+            xtype: 'rallyprojectpicker',
+            showMostRecentlyUsedProjects: false,
+            workspace: Rally.getApp().getContext().getWorkspaceRef(),
+            fieldLabel: this.executionLabel,
+            labelAlign: 'top',
+            margin: 5,
+            listeners: {
+                scope: this,
+                change: this._enableDisableDoneButton
+            }
+        });
+    },
+
+    _enableDisableDoneButton: function() {
+        var execution_project = this.execution_selector && this.execution_selector.getValue();
+        var strategy_project = this.strategy_selector && this.strategy_selector.getValue();
+        var group_name = this.group_name_field && this.group_name_field.getValue();
+        
+        if ( ! execution_project || ! strategy_project || Ext.isEmpty(group_name)) {
+            this._disableDoneButton();
+        } else {
+            this._enableDoneButton();
+        }
+    },
+    
+    _enableDoneButton: function() {
+        this.down('#doneButton').setDisabled(false);
+    },
+
+    _disableDoneButton: function() {
+        this.down('#doneButton').setDisabled(true);
+    },
+    
+    getSelectedValues: function() {
+        var execution_project = this.execution_selector && this.execution_selector.getSelectedRecord();
+        var strategy_project = this.strategy_selector && this.strategy_selector.getSelectedRecord();
+        var group_name = this.group_name_field && this.group_name_field.getValue();
+        if ( ! execution_project || ! strategy_project || Ext.isEmpty(group_name)) {
+            return;
+        }
+        
+        return { 
+            groupName: group_name, 
+            strategyProject: strategy_project, 
+            executionProject: execution_project
+        }
+    }
+});
+Ext.define("TSStrategyExecutionProjectPicker", {
+    extend: 'Rally.app.App',
+    componentCls: 'app',
+    logger: new Rally.technicalservices.Logger(),
+    defaults: { margin: 10 },
+    items: [
+        {xtype:'container',itemId:'message_box',tpl:'Hello, <tpl>{_refObjectName}</tpl>'},
+        {xtype:'container',itemId:'display_box'}
+    ],
+
+    integrationHeaders : {
+        name : "TSStrategyExecutionProjectPicker"
+    },
+                        
+    launch: function() {
+        
+        var groups = [],
+            group_setting = this.getSetting('projectGroups');
+        if (!Ext.isArray(group_setting)){
+            groups = Ext.JSON.decode(group_setting);
+        } else {
+            groups = group_setting;
+        }
+        
+        var html_array = Ext.Array.map(groups, function(group){
+            return Ext.String.format("<strong>{0}</strong>: {1} ({2}) .. {3} ({4})",
+                group.groupName, 
+                group.strategyProjectName, group.strategyProjectRef,
+                group.executionProjectName, group.executionProjectRef
+            );
+        });
+        
+        this.add({xtype:'container',margin: 5, html:html_array.join('<br/>')});
+        
+        
+    },
+    
+    getSettingsFields: function() {
+        return [{
+            name: 'projectGroups',
+            xtype:'tsstrategyexecutiongroupsettingsfield'
+        }];
+    },
+    
+    getOptions: function() {
+        return [
+            {
+                text: 'About...',
+                handler: this._launchInfo,
+                scope: this
+            }
+        ];
+    },
+    
+    _launchInfo: function() {
+        if ( this.about_dialog ) { this.about_dialog.destroy(); }
+        this.about_dialog = Ext.create('Rally.technicalservices.InfoLink',{});
+    },
+    
+    isExternal: function(){
+        return typeof(this.getAppId()) == 'undefined';
+    }
+    
+});
+
+            
+               Rally.launchApp('TSStrategyExecutionProjectPicker', {
+                   name: 'TS Strategy Execution Project Picker'
+               });
+        });
+    </script>
+    
+    <style type="text/css">
+
+.app {
+}
+.tsinfolink {
+    position:absolute;
+    right:0px;
+    width: 14px;
+    height: 14px;
+    border-radius: 7px;
+    text-align: center;
+    color: white;
+    background: #C0C0C0;
+    border-style: solid;
+    border-width: 1px;
+    margin-top: 25px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+    </style>
+
+</head>
+<body></body>
+</html>
