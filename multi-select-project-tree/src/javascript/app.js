@@ -39,6 +39,8 @@ Ext.define("TSMultiProjectTreeSelector", {
             autoShow: true,
             title: 'Choose Project(s)',
             initialSelectedRecords: this.projects,
+            multiple: false,
+            leavesOnly: true,
             introText: 'Some text here',
             listeners: {
                 scope: this,

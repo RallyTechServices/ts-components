@@ -32,6 +32,13 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
         multiple: true,
         
         /**
+         * @cfg {Boolean} leavesOnly
+         * Only allow the user to choose leaf node projects
+         */
+        
+        leavesOnly: false,
+        
+        /**
          * @cfg {Object}  || Rally.data.wsapi.Filter[]  
          * Name of top project to start building the tree down through the hierarchy.
          */
@@ -242,11 +249,18 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
             success: function(store) {
 
                 var mode = this.multiple ? 'MULTI' : 'SINGLE';
-
+                var leavesOnly = this.leavesOnly;
+                
                 var checkbox_model = Ext.create('Rally.ui.selection.CheckboxModel', {
                     mode: mode,
                     enableKeyNav: false,
-                    allowDeselect: true
+                    allowDeselect: true,
+                    isRowSelectable: function (record) {
+                        if ( leavesOnly ) {
+                            return record.get("leaf");
+                        }
+                        return false;
+                    }
                 });
 
                 this.grid = this.add({
@@ -281,6 +295,8 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
             }
         }).always(function() { me.setLoading(false);} );
     },
+    
+    
 
     _enableDoneButton: function() {
         this.down('#doneButton').setDisabled(this.selectionCache.length ? false : true);

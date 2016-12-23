@@ -3,13 +3,13 @@
 <head>
     <title>TSMultiProjectTreeSelector</title>
     <!--  (c) 2016 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Thu Sep 22 2016 18:22:25 GMT-0700 (PDT) -->
+    <!--  Build Date: Fri Dec 23 2016 11:25:09 GMT-0800 (PST) -->
     
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Thu Sep 22 2016 18:22:25 GMT-0700 (PDT)";
+        var APP_BUILD_DATE = "Fri Dec 23 2016 11:25:09 GMT-0800 (PST)";
         var STORY    = "";
         var BUILDER  = "jmartin";
-        var CHECKSUM = 13414247003;
+        var CHECKSUM = 13932514015;
     </script>
     
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -230,12 +230,26 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
          * Title to give to the dialog
          */
         title: 'Choose Project(s)',
-
+        /**
+         * 
+         * @cfg {String} introText
+         * 
+         *  Informational text to include on the dialog.
+         */
+        introText: null,
+        
         /**
          * @cfg {Boolean}
          * Allow multiple selection or not
          */
         multiple: true,
+        
+        /**
+         * @cfg {Boolean} leavesOnly
+         * Only allow the user to choose leaf node projects
+         */
+        
+        leavesOnly: false,
         
         /**
          * @cfg {Object}  || Rally.data.wsapi.Filter[]  
@@ -448,11 +462,18 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
             success: function(store) {
 
                 var mode = this.multiple ? 'MULTI' : 'SINGLE';
-
+                var leavesOnly = this.leavesOnly;
+                
                 var checkbox_model = Ext.create('Rally.ui.selection.CheckboxModel', {
                     mode: mode,
                     enableKeyNav: false,
-                    allowDeselect: true
+                    allowDeselect: true,
+                    isRowSelectable: function (record) {
+                        if ( leavesOnly ) {
+                            return record.get("leaf");
+                        }
+                        return false;
+                    }
                 });
 
                 this.grid = this.add({
@@ -487,6 +508,8 @@ Ext.define('CA.technicalservices.ProjectTreePickerDialog', {
             }
         }).always(function() { me.setLoading(false);} );
     },
+    
+    
 
     _enableDoneButton: function() {
         this.down('#doneButton').setDisabled(this.selectionCache.length ? false : true);
@@ -788,6 +811,8 @@ Ext.define("TSMultiProjectTreeSelector", {
             autoShow: true,
             title: 'Choose Project(s)',
             initialSelectedRecords: this.projects,
+            multiple: false,
+            leavesOnly: true,
             introText: 'Some text here',
             listeners: {
                 scope: this,
